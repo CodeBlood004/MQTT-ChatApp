@@ -1,114 +1,15 @@
-// import 'package:mqtt_chat_app/common%20widgets/custom_button.dart';
-// import 'package:mqtt_chat_app/common%20widgets/custom_text_field.dart';
-// import 'package:mqtt_chat_app/const/image.dart';
-// import 'package:mqtt_chat_app/const/imports.dart';
-// import 'package:mqtt_chat_app/controllers/MQTTManager.dart';
-// import 'package:mqtt_chat_app/model/MQTTAppState.dart';
-// import 'package:mqtt_chat_app/utility/utlity.dart';
-// import 'package:uuid/uuid.dart';
-//
-// class BrokerScreen extends StatefulWidget {
-//   const BrokerScreen({super.key});
-//
-//   @override
-//   State<BrokerScreen> createState() => _BrokerScreenState();
-// }
-//
-// class _BrokerScreenState extends State<BrokerScreen> {
-//
-//   final _brokerAddressController = TextEditingController();
-//   final _topicController = TextEditingController();
-//   late MQTTAppState currentAppState;
-//   late MQTTManager manager;
-//
-//   var uuid = Uuid();
-//   String prefixTest = '';
-//
-//   void _configureAndConnect() {
-//     // ignore: flutter_style_todos
-//     // TODO: Use UUID
-//
-//     String osPrefix = uuid.v1();
-//     prefixTest = osPrefix;
-//
-//     manager = MQTTManager(
-//         host: _brokerAddressController.text,
-//         topic: _topicController.text,
-//         identifier: osPrefix ,
-//
-//         state: currentAppState);
-//     manager.initializeMQTTClient();
-//     manager.connect();
-//   }
-//
-//
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     ScreenUtil.init(context, designSize: const Size(375, 812), minTextAdapt: true, splitScreenMode: true);
-//     return Scaffold(
-//       backgroundColor: lightGray,
-//       appBar: AppBar(
-//
-//         backgroundColor: Colors.transparent,
-//         flexibleSpace: Padding(
-//           padding: EdgeInsets.only(top: 40.h),
-//           child: Center(
-//             child: "Broker Details"
-//                 .text
-//                 .fontFamily(bebasNeue).bold
-//                 .size(30.sp)
-//                 .make(),
-//           ),
-//         ),
-//         centerTitle: true,
-//         automaticallyImplyLeading: false,
-//       ),
-//
-//
-//       body: SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             SizedBox(
-//               height: 200,
-//               width: 200,
-//               child: Image.asset(appLogoWithName),
-//             ),
-//             const HeightBox(15),
-//             const Divider(color: Vx.black, indent: 30, endIndent: 30, thickness: 0),
-//             const HeightBox(15),
-//             Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 "Broker Address".text.make(),
-//                 customTextField(hint: "Broker Address", prefixIcon: Icons.location_on, controller: _brokerAddressController),
-//                 const HeightBox(10),
-//                 "Broker Topic".text.make(),
-//                 customTextField(hint: "Topic Name", prefixIcon: Icons.list,controller: _topicController),
-//
-//                 const HeightBox(20),
-//                 customButton(title: "CONNECT", buttonColor: Vx.black, textColor: Vx.white, onPress: (){} , padding: (60,10),fontSize: 15).centered(),
-//
-//               ],
-//             ).paddingSymmetric(horizontal: 20)
-//           ],
-//         ).paddingSymmetric(horizontal: 24.w),
-//       ),
-//
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:mqtt_chat_app/common%20widgets/custom_button.dart';
 import 'package:mqtt_chat_app/common%20widgets/custom_text_field.dart';
+import 'package:mqtt_chat_app/views/profile%20screen/profile_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:mqtt_chat_app/controllers/MQTTManager.dart';
+import 'package:mqtt_chat_app/providers/mqtt_manager_provider.dart';
+import 'package:mqtt_chat_app/model/MQTTAppState.dart';
+import 'package:mqtt_chat_app/const/color.dart';
 import 'package:mqtt_chat_app/const/image.dart';
 import 'package:mqtt_chat_app/const/imports.dart';
-import 'package:mqtt_chat_app/controllers/MQTTManager.dart';
-import 'package:mqtt_chat_app/model/MQTTAppState.dart';
 import 'package:uuid/uuid.dart';
-import 'package:provider/provider.dart';
 
 class BrokerScreen extends StatefulWidget {
   const BrokerScreen({super.key});
@@ -121,7 +22,6 @@ class _BrokerScreenState extends State<BrokerScreen> {
   final _brokerAddressController = TextEditingController();
   final _topicController = TextEditingController();
   late MQTTAppState currentAppState;
-  late MQTTManager manager;
 
   var uuid = Uuid();
   String prefixTest = '';
@@ -136,18 +36,24 @@ class _BrokerScreenState extends State<BrokerScreen> {
     String osPrefix = uuid.v1();
     prefixTest = osPrefix;
 
-    manager = MQTTManager(
+    MQTTManager manager = MQTTManager(
       host: _brokerAddressController.text,
       topic: _topicController.text,
       identifier: osPrefix,
       state: currentAppState,
     );
+
     manager.initializeMQTTClient();
     manager.connect();
+
+    // Set the manager in the provider
+    Provider.of<MQTTManagerProvider>(context, listen: false).setManager(manager);
+    Get.to(ProfileScreen());
   }
 
   void _disconnect() {
-    manager.disconnect();
+    final manager = Provider.of<MQTTManagerProvider>(context, listen: false).manager;
+    manager?.disconnect();
   }
 
   @override
@@ -190,7 +96,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
                   customTextField(hint: "Broker Address", prefixIcon: Icons.location_on, controller: _brokerAddressController),
                   const HeightBox(10),
                   "Broker Topic".text.make(),
-                  customTextField(hint: "Topic Name", prefixIcon: Icons.list,controller: _topicController),
+                  customTextField(hint: "Topic Name", prefixIcon: Icons.list, controller: _topicController),
                   const HeightBox(20),
                   Consumer<MQTTAppState>(
                     builder: (context, mqttState, child) {
@@ -222,7 +128,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
                         buttonColor: buttonColor,
                         textColor: Vx.white,
                         onPress: buttonAction,
-                        padding: (60,  10),
+                        padding: (60, 10),
                         fontSize: 15,
                       ).centered();
                     },

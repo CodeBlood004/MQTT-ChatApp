@@ -1,7 +1,11 @@
-import 'package:mqtt_chat_app/common%20widgets/custom_button.dart';
-import 'package:mqtt_chat_app/common%20widgets/custom_text_field.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mqtt_chat_app/const/color.dart';
 import 'package:mqtt_chat_app/const/image.dart';
 import 'package:mqtt_chat_app/const/imports.dart';
+import 'package:mqtt_chat_app/common%20widgets/custom_button.dart';
+import 'package:mqtt_chat_app/common%20widgets/custom_text_field.dart';
+import 'package:mqtt_chat_app/providers/mqtt_manager_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,13 +17,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final userNameController = TextEditingController();
 
+  void _sendMessage() {
+    final manager = Provider.of<MQTTManagerProvider>(context, listen: false).manager;
+    final message = "Name: ${userNameController.text}";
+    if (manager != null) {
+      manager.publish(message);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Not connected to MQTT broker"),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context, designSize: const Size(375, 812), minTextAdapt: true, splitScreenMode: true);
     return Scaffold(
       backgroundColor: lightGray,
       appBar: AppBar(
-
         backgroundColor: Colors.transparent,
         flexibleSpace: Padding(
           padding: EdgeInsets.only(top: 40.h),
@@ -34,35 +49,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-
-
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
-              height: 150,
-              width: 350,
-              child: Image.asset(mosquitoLogoHorizontal,),
+              height: 200,
+              width: 200,
+              child: Image.asset(appLogoWithName),
             ),
-            // const HeightBox(),
+            const HeightBox(15),
             const Divider(color: Vx.black, indent: 30, endIndent: 30, thickness: 0),
             const HeightBox(15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 "User Name".text.make(),
-                customTextField(hint: "Full Name", prefixIcon: Icons.person, controller: userNameController),
-
+                customTextField(hint: "User Name", prefixIcon: Icons.person, controller: userNameController),
                 const HeightBox(20),
-                customButton(title: "Start Messaging", buttonColor: Vx.black, textColor: Vx.white, onPress: (){} , padding: (60,10),fontSize: 15).centered(),
-
+                customButton(
+                  title: "Start Messaging",
+                  buttonColor: Vx.black,
+                  textColor: Vx.white,
+                  onPress: _sendMessage,
+                  padding: (60, 10),
+                  fontSize: 15,
+                ).centered(),
               ],
-            ).paddingSymmetric(horizontal: 20)
+            ).paddingSymmetric(horizontal: 20),
           ],
-        ),
-      ).paddingSymmetric(horizontal: 24.w),
-
-    ) ;
+        ).paddingSymmetric(horizontal: 24.w),
+      ),
+    );
   }
 }
-
