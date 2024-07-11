@@ -48,7 +48,15 @@ class _BrokerScreenState extends State<BrokerScreen> {
 
     // Set the manager in the provider
     Provider.of<MQTTManagerProvider>(context, listen: false).setManager(manager);
-    Get.to(ProfileScreen());
+
+    // Add a listener to the connection state
+    currentAppState.addListener(() {
+      if (currentAppState.getAppConnectionState == MQTTAppConnectionState.connected) {
+        Future.delayed(const Duration(seconds: 1), () {
+          Get.to(() => const ProfileScreen(), transition: Transition.rightToLeft);
+        });
+      }
+    });
   }
 
   void _disconnect() {

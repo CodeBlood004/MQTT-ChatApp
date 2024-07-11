@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mqtt_chat_app/const/color.dart';
+import 'package:mqtt_chat_app/const/identity_client.dart';
 import 'package:mqtt_chat_app/const/image.dart';
 import 'package:mqtt_chat_app/const/imports.dart';
 import 'package:mqtt_chat_app/views/Message%20Screen/widgets/chat_field.dart';
@@ -33,7 +34,7 @@ class _MessageScreenState extends State<MessageScreen> {
     if (_messageController.text.trim().isNotEmpty) {
       final manager =
           Provider.of<MQTTManagerProvider>(context, listen: false).manager;
-      final messageText = "2:${_messageController.text.trim()}"; // Add "1:" prefix
+      final messageText = (messageA+_messageController.text).trim(); // Add "1:" prefix
       print(manager);
       if (manager != null) {
         manager.publish(messageText);
@@ -52,14 +53,14 @@ class _MessageScreenState extends State<MessageScreen> {
 
     if (manager != null) {
       manager.subscribe((message) {
-        if (message.startsWith("2:")) {
+        if (message.startsWith(messageA)) {
           // Skip adding messages that start with "1:" prefix
           return;
-        }else  if (message.contains("Name1: ")) {
+        }else  if (message.contains(nameB)) {
           setState(() {
-            name = message.replaceFirst("Name1: ", "");
+            name = message.replaceFirst(nameB, "");
           });
-        }else  if (message.startsWith("1:")) {
+        }else  if (message.startsWith(messageB)) {
           setState(() {
             _messages.add(Message(content: message, sender: false));
           });
