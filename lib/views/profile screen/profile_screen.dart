@@ -18,10 +18,14 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final userNameController = TextEditingController();
 
+
+
   void _sendMessage() {
     final manager = Provider.of<MQTTManagerProvider>(context, listen: false).manager;
-    final message = "Name1: ${userNameController.text}";
+    final message = "Name2: ${userNameController.text}";
+    _subscribeToMessages();
     if (manager != null) {
+
       manager.publish(message);
       Get.to(const MessageScreen());
 
@@ -29,6 +33,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Not connected to MQTT broker"),
       ));
+    }
+  }
+
+
+  void _subscribeToMessages() {
+    final manager =  Provider.of<MQTTManagerProvider>(context, listen: false).manager;
+
+    if (manager != null) {
+      manager.subscribe((message) {
+        if (message.contains("Name1: ")) {
+          setState(() {
+            name = message.replaceFirst("Name1: ", "");
+          });
+        }
+      });
     }
   }
 

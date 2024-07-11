@@ -8,6 +8,9 @@ import 'package:mqtt_chat_app/views/Message%20Screen/widgets/chat_field.dart';
 import 'package:provider/provider.dart';
 import 'package:mqtt_chat_app/providers/mqtt_manager_provider.dart';
 
+
+String? name;
+
 class MessageScreen extends StatefulWidget {
   const MessageScreen({Key? key}) : super(key: key);
 
@@ -18,7 +21,7 @@ class MessageScreen extends StatefulWidget {
 class _MessageScreenState extends State<MessageScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Message> _messages = [];
-  String? _name;
+
 
   @override
   void initState() {
@@ -30,8 +33,7 @@ class _MessageScreenState extends State<MessageScreen> {
     if (_messageController.text.trim().isNotEmpty) {
       final manager =
           Provider.of<MQTTManagerProvider>(context, listen: false).manager;
-      final messageText =
-          "1:" + _messageController.text.trim(); // Add "1:" prefix
+      final messageText = "2:${_messageController.text.trim()}"; // Add "1:" prefix
       print(manager);
       if (manager != null) {
         manager.publish(messageText);
@@ -50,20 +52,14 @@ class _MessageScreenState extends State<MessageScreen> {
 
     if (manager != null) {
       manager.subscribe((message) {
-        if (message.startsWith("1:")) {
+        if (message.startsWith("2:")) {
           // Skip adding messages that start with "1:" prefix
           return;
-        }
-
-        if (message.contains("Name2: ")) {
+        }else  if (message.contains("Name1: ")) {
           setState(() {
-            _name = message.replaceFirst("Name2: ", "");
+            name = message.replaceFirst("Name1: ", "");
           });
-          return;
-        }else
-        if (message.contains("Name1: ")) {
-          return;
-        } else {
+        }else  if (message.startsWith("1:")) {
           setState(() {
             _messages.add(Message(content: message, sender: false));
           });
@@ -99,7 +95,7 @@ class _MessageScreenState extends State<MessageScreen> {
                 radius: 20.0,
               ),
               SizedBox(width: 10.w),
-              (_name ?? "Name").text.fontFamily(bebasNeue).size(30.sp).make(),
+              (name ?? "Name").text.fontFamily(bebasNeue).size(30.sp).make(),
             ],
           ),
         ),
