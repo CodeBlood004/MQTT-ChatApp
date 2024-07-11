@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mqtt_chat_app/views/Message%20Screen/message_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mqtt_chat_app/const/color.dart';
 import 'package:mqtt_chat_app/const/image.dart';
@@ -19,11 +20,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _sendMessage() {
     final manager = Provider.of<MQTTManagerProvider>(context, listen: false).manager;
-    final message = "Name: ${userNameController.text}";
+    final message = "Name1: ${userNameController.text}";
     if (manager != null) {
       manager.publish(message);
+      Get.to(const MessageScreen());
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Not connected to MQTT broker"),
       ));
     }

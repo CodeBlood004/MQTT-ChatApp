@@ -45,6 +45,17 @@ class MQTTManager {
     _client!.connectionMessage = connMess;
   }
 
+
+
+  void subscribe(void Function(String message) callback) {
+    _client!.subscribe(_topic, MqttQos.atLeastOnce);
+    _client!.updates!.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
+      final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+      final String pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message!);
+      callback(pt);
+    });
+  }
+
   // Connect to the host
   // ignore: avoid_void_async
   void connect() async {
@@ -97,7 +108,7 @@ class MQTTManager {
       // final MqttPublishMessage recMess = c![0].payload;
       final String pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message!);
-      _currentState.setReceivedText(pt);
+      // _currentState.setReceivedText(pt);
       print(
           'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');

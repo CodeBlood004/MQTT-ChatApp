@@ -24,7 +24,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
   late MQTTAppState currentAppState;
 
   var uuid = Uuid();
-  String prefixTest = '';
+  String prefixTest = '2';
 
   @override
   void initState() {

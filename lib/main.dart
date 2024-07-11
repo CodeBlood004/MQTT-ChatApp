@@ -1,3 +1,4 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mqtt_chat_app/providers/mqtt_manager_provider.dart';
@@ -47,16 +48,16 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const  BrokerScreen(),
-        // home: AnimatedSplashScreen(
-        //     splash: Image.asset(appLogoWithName),
-        //     splashIconSize: 250,
-        //     duration: 1500,
-        //     backgroundColor: lightGray,
-        //     splashTransition: SplashTransition.fadeTransition,
-        //     pageTransitionType: PageTransitionType.leftToRight,
-        //     nextScreen: const BrokerScreen(),
-        // ),
+        // home: const  MessageScreen(),
+        home: AnimatedSplashScreen(
+            splash: Image.asset(appLogoWithName),
+            splashIconSize: 250,
+            duration: 1500,
+            backgroundColor: lightGray,
+            splashTransition: SplashTransition.fadeTransition,
+            pageTransitionType: PageTransitionType.leftToRight,
+            nextScreen: const BrokerScreen(),
+        ),
       ),
     );
   }
